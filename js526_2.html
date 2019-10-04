@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+		<meta lang="es">
+		<meta name="description" content="Resumen del contenido"> 
+		<meta name="description" content="Free Web tutorials">
+  		<meta name="keywords" content="HTML,CSS,XML,JavaScript">
+  		<meta name="author" content="Juan Carlos">
+	<title>buscar y borrar nodos -  removeChild</title>
+	<style type="text/css">
+		div {
+			background-color: yellow;
+			width: 500px;
+			height:300px;
+		}
+		li {
+			color: red;
+		}
+	</style>
+	<!-- libreria JQuery-->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript">
+		//paso 1º
+		//activar funcion de añadir elementos a la lista
+		//activar funcion de borrar todos los elementos de la lista
+		//verificar que el elemento a añadir no exista en la lista
+		
+
+
+		// paso 4
+		//al cargar la pagina los botones de borrar elemento y modificar aparecen desactivados
+		// 
+		//declarar un array de elementos de la lista
+		//variables globales
+		var arrayElementos = new Array();
+		var posicion;
+		//activar listeners
+		window.onload = function() {
+			document.getElementById('anyadir').addEventListener('click',nuevoElemento);
+			document.getElementById('borraTodo').addEventListener('click',borrarLista);
+			document.getElementById('modificar').addEventListener('click',modificar);
+			document.getElementById('borrarElemento').addEventListener('click',borrarElemento);
+			document.getElementById('modificar').disabled=true;
+			document.getElementById('borrarElemento').disabled=true;
+			document.getElementById('borraTodo').disabled=true;
+
+		}
+		//función invocada desde el boton y áñade nuevo elementos a la lista
+		function nuevoElemento() {
+			//alert('nuevoElemento')
+			//recuperar el valor del texto
+			var elemento = document.getElementById('elemento').value;
+			//verificar si existe el elemento en el array
+			if (arrayElementos.includes(elemento)) {
+				alert('Elemento ya existe');
+				return;
+			} 
+			if (elemento.trim()=='') {
+				alert('contenido vacio');
+				return;
+			}
+			//guardar elemento en el array
+			arrayElementos.push(elemento);
+			//mostrar en la caja
+			//Creación del nodo
+			var nodoLi = document.createElement('li')
+			nodoLi.innerText = elemento;
+			document.getElementById('lista').append(nodoLi);
+			//borra contenido de la entrada (#elemento)
+			document.getElementById('elemento').value='';
+			//activar listener de la etiqueta creada
+			//nodoLi es una etiqueta 'Li' creada por CreateElement('li')
+			nodoLi.addEventListener('click',editar);
+			//opcion 2  sin crear el  nodo injectando el código
+			//document.getElementById('lista').innerHTML+='<li>'+elemento+'</li>'
+			document.getElementById('borraTodo').disabled=false;
+			document.getElementById('modificar').disabled=true;
+			document.getElementById('borrarElemento').disabled=true;
+			
+		}
+
+		//funcion invocada desde el boton de borrar lista. Borra toda la lista completa
+		function borrarLista() {
+			//alert('borrarLista')
+			document.getElementById('lista').innerHTML='';
+			//borra el array donde se va guardando la lista	
+			arrayElementos=[];
+			//borra la lista contenida en la caja
+			document.getElementById('elemento').value='';
+			document.getElementById('anyadir').disabled=false;
+			document.getElementById('modificar').disabled=true;
+			document.getElementById('borrarElemento').disabled=true;
+			document.getElementById('borraTodo').disabled=true;
+			//alert('borrada la lista');
+		}
+
+		//funcion invocada desde el listener de la etiquta LI  de la lista
+		function editar() {
+			//alert ('editar')
+			//guardar contenido de la etiqueta LI selecionada por desde el listener creado
+			var contenido=this.innerText;
+			//enviar al formulario
+			document.getElementById('elemento').value=contenido;
+			//añadir un boton de modificar el contenido de la opción seleccionada
+			//recuperar la posición del elemento en el array
+			posicion=arrayElementos.indexOf(contenido);
+			document.getElementById('anyadir').disabled=true;
+			document.getElementById('borrarElemento').disabled=false;
+			document.getElementById('modificar').disabled=false;
+			document.getElementById('borraTodo').disabled=true;
+
+			//alert(posicion);
+		}
+
+		//funcion invocado por el boton de modificar
+		function modificar() {
+			//alert('modificar');
+			//recuperar el valor del formulario
+			
+			var valorNuevo = document.getElementById('elemento').value;
+			//comprabar que no existe en el array
+			//verificar si existe el elemento en el array
+			if (arrayElementos.includes(valorNuevo)) {
+				alert('Elemento ya existe');
+				return;
+			} 
+			if (valorNuevo.trim() =='') {
+				alert('contenido vacio');
+				return;
+			}
+			//modificar el elemento en el array
+			arrayElementos[posicion]=valorNuevo;
+			//modificar el elemento en la lista
+			document.querySelectorAll('li')[posicion].innerText=valorNuevo;
+			//vacia el texto en #elemento
+			document.getElementById('elemento').value='';
+			document.getElementById('anyadir').disabled=false;
+			document.getElementById('borraTodo').disabled=false;
+			document.getElementById('modificar').disabled=true;
+			document.getElementById('borrarElemento').disabled=true;
+		}
+
+		//funcion invocada por el boton de Borrar un elemento de la lista
+		function borrarElemento() {
+			//alert('borrarElemento');
+			//console.log(arrayElementos)
+			//borra un elemento segun posicion y borra los elementos que se indican el segundo parametro
+			arrayElementos.splice(posicion,1);
+			//console.log(arrayElementos)
+			//alert('mirar')
+
+			//buscar elemento a borrar
+			var elementoBorrar= document.querySelectorAll('#lista li')[posicion]
+			//buscar el padre del elemento a borrar (2 opciones posibles)
+			//opcion 
+			var padre = elementoBorrar.parentNode;
+			//var padre = document.getElementById('lista');
+			//borrar elemento a partir del padre
+			padre.removeChild(elementoBorrar);
+			document.getElementById('elemento').value='';
+			document.getElementById('anyadir').disabled=false;
+			document.getElementById('borraTodo').disabled=false;
+			document.getElementById('modificar').disabled=true;
+			document.getElementById('borrarElemento').disabled=true;
+		}
+		
+	</script>
+</head>
+<body>
+	<main>
+		<div>
+			<input type="text" name="elemento" id="elemento">
+			<br><br><br>
+			<input type="button" name="anyadir" id="anyadir" value="Añadir Elemento">
+			<input type="button" name="borraTodo" id="borraTodo" value="Borrar lista">
+			<input type="button" name="modificar" id="modificar" value="Modificar contenido">
+			<input type="button" name="borrarElemento" id="borrarElemento" value="Borrar elemento">
+			<br><br>
+			<ul id="lista"></ul>
+		</div>
+	</main>
+
+</body>
+</html>
